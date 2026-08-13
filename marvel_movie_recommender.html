@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marvel Movie Recommender for Kids</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #10152b, #3b0b16);
+    color: white;
+    min-height: 100vh;
+  }
+  header {
+    text-align: center;
+    padding: 35px 15px 20px;
+  }
+  h1 {
+    margin: 0;
+    font-size: 42px;
+    color: #ffcc00;
+    text-shadow: 3px 3px #e62429;
+  }
+  header p { font-size: 18px; }
+  .app {
+    max-width: 900px;
+    margin: auto;
+    padding: 20px;
+  }
+  .panel {
+    background: rgba(255,255,255,.1);
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 20px;
+    padding: 25px;
+    backdrop-filter: blur(8px);
+  }
+  label {
+    display: block;
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+  select, button {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    font-size: 17px;
+  }
+  select { margin-bottom: 15px; }
+  button {
+    background: #e62429;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  button:hover { background: #ff3b30; transform: scale(1.01); }
+  #result {
+    margin-top: 25px;
+    display: none;
+    background: white;
+    color: #222;
+    border-radius: 20px;
+    padding: 25px;
+    text-align: center;
+  }
+  .hero {
+    font-size: 65px;
+  }
+  .movie-title {
+    font-size: 30px;
+    color: #e62429;
+    margin: 8px 0;
+  }
+  .badge {
+    display: inline-block;
+    background: #ffcc00;
+    padding: 7px 12px;
+    border-radius: 20px;
+    font-weight: bold;
+    margin: 5px;
+  }
+  .reason {
+    font-size: 18px;
+    line-height: 1.5;
+  }
+  .note {
+    margin-top: 20px;
+    font-size: 13px;
+    opacity: .8;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🦸 Marvel Movie Finder</h1>
+  <p>Pick your mood and discover a Marvel movie!</p>
+</header>
+
+<div class="app">
+  <div class="panel">
+    <label for="mood">😊 What kind of movie do you want?</label>
+    <select id="mood">
+      <option value="fun">😂 Funny & Fun</option>
+      <option value="action">⚡ Action & Adventure</option>
+      <option value="hero">🦸 Superhero Story</option>
+      <option value="space">🚀 Space Adventure</option>
+      <option value="team">🤝 Superhero Team</option>
+    </select>
+
+    <button onclick="recommendMovie()">🎬 Recommend a Movie</button>
+
+    <div id="result">
+      <div class="hero" id="emoji">🦸</div>
+      <h2 class="movie-title" id="title"></h2>
+      <div id="tags"></div>
+      <p class="reason" id="reason"></p>
+    </div>
+
+    <p class="note">
+      ⭐ Recommendations are general kid-friendly suggestions. Check your family's
+      preferred age rating before watching.
+    </p>
+  </div>
+</div>
+
+<script>
+const movies = {
+  fun: [
+    {
+      title: "Ant-Man",
+      emoji: "🐜",
+      tags: ["Funny", "Adventure"],
+      reason: "A small hero with a big adventure! It has lots of jokes, action, and superhero fun."
+    },
+    {
+      title: "Thor: Ragnarok",
+      emoji: "⚡",
+      tags: ["Funny", "Action"],
+      reason: "Thor goes on a colorful space adventure with plenty of humor and exciting moments."
+    },
+    {
+      title: "Guardians of the Galaxy",
+      emoji: "🚀",
+      tags: ["Funny", "Space"],
+      reason: "A funny group of unlikely heroes team up for a big space adventure."
+    }
+  ],
+  action: [
+    {
+      title: "Spider-Man: Homecoming",
+      emoji: "🕷️",
+      tags: ["Action", "School"],
+      reason: "Peter Parker balances being a student with learning how to become a superhero."
+    },
+    {
+      title: "Black Panther",
+      emoji: "🐾",
+      tags: ["Action", "Hero"],
+      reason: "A young king protects Wakanda while facing a powerful challenge."
+    }
+  ],
+  hero: [
+    {
+      title: "Captain America: The First Avenger",
+      emoji: "🛡️",
+      tags: ["Hero", "Adventure"],
+      reason: "Steve Rogers becomes Captain America and learns what it means to be a true hero."
+    },
+    {
+      title: "Iron Man",
+      emoji: "🤖",
+      tags: ["Hero", "Technology"],
+      reason: "Tony Stark creates a powerful suit and begins his journey as Iron Man."
+    }
+  ],
+  space: [
+    {
+      title: "Guardians of the Galaxy",
+      emoji: "🚀",
+      tags: ["Space", "Funny"],
+      reason: "Travel through space with a hilarious team of heroes and their unusual friends."
+    },
+    {
+      title: "The Marvels",
+      emoji: "🌟",
+      tags: ["Space", "Team"],
+      reason: "Several heroes join forces for a colorful cosmic adventure."
+    }
+  ],
+  team: [
+    {
+      title: "The Avengers",
+      emoji: "🦸‍♂️",
+      tags: ["Team", "Action"],
+      reason: "Iron Man, Captain America, Thor and other heroes join together to save the world."
+    },
+    {
+      title: "Avengers: Age of Ultron",
+      emoji: "🤖",
+      tags: ["Team", "Action"],
+      reason: "The Avengers work together against a powerful artificial-intelligence enemy."
+    }
+  ]
+};
+
+function recommendMovie() {
+  const mood = document.getElementById("mood").value;
+  const list = movies[mood];
+  const movie = list[Math.floor(Math.random() * list.length)];
+
+  document.getElementById("emoji").textContent = movie.emoji;
+  document.getElementById("title").textContent = movie.title;
+  document.getElementById("reason").textContent = movie.reason;
+
+  document.getElementById("tags").innerHTML =
+    movie.tags.map(tag => `<span class="badge">⭐ ${tag}</span>`).join("");
+
+  document.getElementById("result").style.display = "block";
+}
+</script>
+
+</body>
+</html>
